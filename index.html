@@ -3,622 +3,996 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
 <title>Google Classroom</title>
-
 <link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, sans-serif;
+* {
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-body{
-    background:#0f0f0f;
-    color:white;
-    overflow:hidden;
+body {
+    background: #0a0a0f; 
+    color: #f3f4f6; 
+    overflow: hidden;
 }
 
-.app{
-    display:flex;
-    width:100vw;
-    height:100vh;
+/* =========================================================
+   AUTH SCREEN GLOW-UP
+========================================================= */
+.auth-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: radial-gradient(circle at center, #1b1b2f 0%, #0a0a0f 100%); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 999;
 }
 
-.sidebar{
-    width:260px;
-    background:#141414;
-    border-right:1px solid #242424;
-    padding:20px;
+.auth-box {
+    background: #14141f; 
+    padding: 35px; 
+    border-radius: 16px; 
+    border: 1px solid #232338; 
+    width: 100%; 
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
 }
 
-.logo{
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:25px;
+.auth-box h2 { 
+    margin-bottom: 24px; 
+    text-align: center; 
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
 }
 
-.input-group{
-    margin-bottom:16px;
+/* =========================================================
+   SIDEBAR & MAIN DASHBOARD GLOW-UP
+========================================================= */
+.app {
+    display: none; 
+    width: 100vw; 
+    height: 100vh;
+    background: #07070a;
 }
 
-.input-group label{
-    display:block;
-    margin-bottom:6px;
-    color:#aaa;
-    font-size:14px;
+.sidebar {
+    width: 300px; 
+    background: #0f1016; 
+    border-right: 1px solid #1e1e2d; 
+    padding: 24px; 
+    display: flex; 
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.3);
 }
 
-input{
-    width:100%;
-    padding:12px;
-    border:none;
-    outline:none;
-    border-radius:10px;
-    background:#1e1e1e;
-    color:white;
+.logo { 
+    font-size: 22px; 
+    font-weight: 8s00; 
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin-bottom: 5px;
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-button{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:#3b82f6;
-    color:white;
-    cursor:pointer;
-    font-weight:bold;
-    margin-top:10px;
+.user-profile { 
+    font-size: 13px; 
+    color: #10b981; 
+    margin-bottom: 12px; 
+    padding: 10px 14px; 
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-weight: 500;
 }
 
-button:hover{
-    opacity:0.9;
+.input-group { 
+    margin-bottom: 12px; 
 }
 
-.main{
-    flex:1;
-    position:relative;
-    background:#0a0a0a;
+.input-group label { 
+    display: block; 
+    margin-bottom: 6px; 
+    color: #9ca3af; 
+    font-size: 13px; 
+    font-weight: 500;
 }
 
-#remoteVideo{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    background:black;
+input {
+    width: 100%; 
+    padding: 12px 14px; 
+    border: 1px solid #232338; 
+    outline: none; 
+    border-radius: 12px; 
+    background: #161623; 
+    color: white; 
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
 }
 
-#localVideo{
-    position:absolute;
-    width:240px;
-    height:160px;
-    right:20px;
-    bottom:20px;
-    border-radius:14px;
-    object-fit:cover;
-    border:2px solid #333;
-    background:black;
-    z-index:100;
+input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    background: #1a1a2b;
 }
 
-.status{
-    position:absolute;
-    top:20px;
-    left:20px;
-    padding:10px 14px;
-    border-radius:10px;
-    background:rgba(0,0,0,0.6);
-    font-size:14px;
-    z-index:50;
+button {
+    width: 100%; 
+    padding: 12px; 
+    border: none; 
+    border-radius: 12px; 
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+    color: white; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 14px;
+    margin-top: 6px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.error{
-    color:#ff5b5b;
+button:hover { 
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(59, 130, 246, 0.35);
 }
 
-.success{
-    color:#58ff8a;
+button:active {
+    transform: translateY(1px);
+}
+
+.secondary-btn { 
+    background: #1c1d29; 
+    color: #d1d5db; 
+    border: 1px solid #2e3046;
+    box-shadow: none;
+    margin-top: 10px;
+}
+
+.secondary-btn:hover {
+    background: #25273b;
+    color: white;
+    box-shadow: none;
+}
+
+/* =========================================================
+   ONLINE USER LIST GLOW-UP
+========================================================= */
+.user-list-title { 
+    font-size: 12px; 
+    color: #9ca3af; 
+    margin-top: 20px; 
+    margin-bottom: 10px; 
+    font-weight: 700; 
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.user-list { 
+    flex: 1; 
+    overflow-y: auto; 
+    margin-bottom: 12px; 
+}
+
+/* Scrollbar customizations */
+.user-list::-webkit-scrollbar {
+    width: 6px;
+}
+.user-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.user-list::-webkit-scrollbar-thumb {
+    background: #222235;
+    border-radius: 4px;
+}
+
+.user-item {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: #141421; 
+    padding: 12px 14px; 
+    border-radius: 12px; 
+    margin-bottom: 8px;
+    border: 1px solid #1e1e2d;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: all 0.2s ease-in-out;
+}
+
+.user-item:hover {
+    background: #1c1c2e;
+    border-color: #2e2e46;
+    transform: translateX(2px);
+}
+
+/* Status Pulsing Dot styling */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.status-dot.online {
+    background-color: #10b981;
+}
+
+.status-dot.online::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #10b981;
+    animation: pulse 2s infinite ease-in-out;
+    left: 0;
+    top: 0;
+}
+
+.status-dot.busy {
+    background-color: #f59e0b;
+}
+
+.status-dot.busy::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #f59e0b;
+    animation: pulse 2s infinite ease-in-out;
+    left: 0;
+    top: 0;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(2.8);
+        opacity: 0;
+    }
+}
+
+.call-btn { 
+    width: auto; 
+    padding: 6px 12px; 
+    font-size: 11px; 
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+    margin-top: 0; 
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    border-radius: 8px;
+}
+
+.call-btn:hover {
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+.call-btn.busy-btn {
+    background: #27273a;
+    color: #6b7280;
+    box-shadow: none;
+    cursor: not-allowed;
+    border: 1px solid #1e1e2d;
+    pointer-events: none;
+}
+
+/* =========================================================
+   MAIN STREAM AREA & CONTROL HOVER PANEL
+========================================================= */
+.main { 
+    flex: 1; 
+    position: relative; 
+    background: black; 
+}
+
+#remoteVideo { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+    background: black; 
+}
+
+#localVideo {
+    position: absolute; 
+    width: 240px; 
+    height: 160px; 
+    right: 24px; 
+    bottom: 24px; 
+    border-radius: 14px; 
+    object-fit: cover; 
+    border: 2px solid #1e1e2f; 
+    background: #0f1016; 
+    z-index: 100;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+}
+
+.status {
+    position: absolute; 
+    top: 24px; 
+    left: 24px; 
+    padding: 10px 16px; 
+    border-radius: 12px; 
+    background: rgba(15, 16, 22, 0.85); 
+    color: #f3f4f6;
+    font-size: 13px; 
+    z-index: 50;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}
+
+.status.error {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.status.success {
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Red Dynamic End Call Button */
+.hangup-btn {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    z-index: 150;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hangup-btn:hover {
+    transform: translateX(-50%) translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.6);
+}
+
+.hangup-btn:active {
+    transform: translateX(-50%) translateY(1px);
 }
 </style>
 </head>
 <body>
 
-<div class="app">
+<div id="authScreen" class="auth-overlay">
+    <div class="auth-box">
+        <h2 id="authTitle">Secure Calling Account</h2>
+        <input type="text" id="authUsername" placeholder="Create Username">
+        <div style="height: 10px;"></div>
+        <input type="password" id="authPassword" placeholder="Create Password">
+        <button id="loginBtn">LOG IN</button>
+        <button id="signupBtn" class="secondary-btn">REGISTER USER</button>
+    </div>
+</div>
 
+<div id="appScreen" class="app">
     <div class="sidebar">
-
         <div class="logo">Secure Call</div>
+        <div id="userProfile" class="user-profile">Connecting User...</div>
 
-        <div class="input-group">
-            <label>User Handle</label>
-            <input id="username" placeholder="Enter username">
+        <div class="input-group" style="display:none;">
+            <input id="roomInput">
         </div>
 
-        <div class="input-group">
-            <label>Room ID</label>
-            <input id="roomInput" placeholder="Enter room id">
-        </div>
+        <button id="startMediaBtn">ALLOW CAMERA/MIC</button>
+        
+        <div class="user-list-title">ONLINE USERS</div>
+        <div id="userList" class="user-list"></div>
 
-        <button id="startMediaBtn">
-            ENABLE CAMERA/MIC
-        </button>
-
-        <button id="joinBtn">
-            JOIN ROOM
-        </button>
-
+        <button id="logoutBtn" class="secondary-btn" style="margin-top:auto;">LOG OUT</button>
     </div>
 
     <div class="main">
+        <div id="status" class="status">Idle</div>
+        
+        <video id="remoteVideo" autoplay playsinline></video>
+        <video id="localVideo" autoplay muted playsinline></video>
 
-        <div id="status" class="status">
-            Idle
-        </div>
-
-        <video
-            id="remoteVideo"
-            autoplay
-            playsinline
-        ></video>
-
-        <video
-            id="localVideo"
-            autoplay
-            muted
-            playsinline
-        ></video>
-
+        <!-- Dynamic Hang Up / End Call control -->
+        <button id="hangupBtn" class="hangup-btn" style="display:none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-off"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-5.33-5.34A19.79 19.79 0 0 1 2 3.1c0 0 .1-.5.7-.6a2 2 0 0 1 2-1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L3.68 6.68a16 16 0 0 0 2.6 3.4M23 1 1 23"/></svg>
+            HANG UP
+        </button>
     </div>
-
 </div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-
 /* =========================================================
    TAB CLOAKING
 ========================================================= */
-
 document.title = "Google Classroom";
-
-const favicon = document.querySelector(
-    "link[rel='icon']"
-);
-
-favicon.href =
-"https://ssl.gstatic.com/classroom/favicon.png";
+const favicon = document.querySelector("link[rel='icon']");
+favicon.href = "https://ssl.gstatic.com/classroom/favicon.png";
 
 /* =========================================================
-   CLOUDFLARE WORKER PROXY HOOK
+   SUPABASE CONFIGURATION
 ========================================================= */
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
 
-const WORKER_PROXY_PREFIX = "/service/";
+class LocalDBMock {
+    constructor() {
+        this.listeners = [];
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'room_signaling_change' || e.key === 'profiles_change') {
+                this.triggerListeners(e.key);
+            }
+        });
+    }
 
-/*
-Example usage:
+    triggerListeners(key) {
+        this.listeners.forEach(l => {
+            if (key === 'profiles_change' && l.table === 'profiles') {
+                l.callback({ new: {} });
+            }
+            if (key === 'room_signaling_change' && l.table === 'room_signaling') {
+                const signals = JSON.parse(localStorage.getItem('room_signaling') || '[]');
+                const lastSignal = signals[signals.length - 1];
+                if (lastSignal && (!l.filter || this.matchFilter(lastSignal, l.filter))) {
+                    l.callback({ new: lastSignal });
+                }
+            }
+        });
+    }
 
-window.location.href =
-WORKER_PROXY_PREFIX +
-encodeURIComponent("https://example.com");
-*/
+    matchFilter(item, filterStr) {
+        if (!filterStr) return true;
+        const [field, valPart] = filterStr.split('=eq.');
+        if (field && valPart) {
+            return String(item[field]) === String(valPart);
+        }
+        return true;
+    }
+
+    from(table) {
+        const self = this;
+        return {
+            insert: async (row) => {
+                if (table === 'profiles') {
+                    const profiles = JSON.parse(localStorage.getItem('local_profiles') || '[]');
+                    const existing = profiles.find(p => p.username === row.username);
+                    if (existing) {
+                        return { error: new Error("Username taken") };
+                    }
+                    profiles.push({ ...row, last_seen: new Date().toISOString() });
+                    localStorage.setItem('local_profiles', JSON.stringify(profiles));
+                    localStorage.setItem('profiles_change', Date.now().toString());
+                    self.triggerListeners('profiles_change');
+                    return { data: row, error: null };
+                }
+                if (table === 'room_signaling') {
+                    const signals = JSON.parse(localStorage.getItem('room_signaling') || '[]');
+                    const id = Date.now() + Math.random().toString();
+                    const newRow = { id, ...row };
+                    signals.push(newRow);
+                    localStorage.setItem('room_signaling', JSON.stringify(signals));
+                    localStorage.setItem('room_signaling_change', Date.now().toString());
+                    self.triggerListeners('room_signaling_change');
+                    return { data: [newRow], error: null };
+                }
+                return { error: null };
+            },
+            select: (query = "*") => {
+                return {
+                    eq: (field, value) => {
+                        return {
+                            eq: (f2, v2) => {
+                                return {
+                                    then: (resolve) => {
+                                        if (table === 'profiles') {
+                                            const profiles = JSON.parse(localStorage.getItem('local_profiles') || '[]');
+                                            const filtered = profiles.filter(p => p[field] === value && p[f2] === v2);
+                                            resolve({ data: filtered, error: null });
+                                        } else if (table === 'room_signaling') {
+                                            const signals = JSON.parse(localStorage.getItem('room_signaling') || '[]');
+                                            const filtered = signals.filter(s => s[field] === value && s[f2] === v2);
+                                            resolve({ data: filtered, error: null });
+                                        } else {
+                                            resolve({ data: [], error: null });
+                                        }
+                                    }
+                                };
+                            },
+                            then: (resolve) => {
+                                if (table === 'profiles') {
+                                    const profiles = JSON.parse(localStorage.getItem('local_profiles') || '[]');
+                                    const filtered = profiles.filter(p => p[field] === value);
+                                    resolve({ data: filtered, error: null });
+                                } else if (table === 'room_signaling') {
+                                    const signals = JSON.parse(localStorage.getItem('room_signaling') || '[]');
+                                    const filtered = signals.filter(s => s[field] === value);
+                                    resolve({ data: filtered, error: null });
+                                } else {
+                                    resolve({ data: [], error: null });
+                                }
+                            }
+                        };
+                    },
+                    then: (resolve) => {
+                        if (table === 'profiles') {
+                            const profiles = JSON.parse(localStorage.getItem('local_profiles') || '[]');
+                            resolve({ data: profiles, error: null });
+                        } else {
+                            resolve({ data: [], error: null });
+                        }
+                    }
+                };
+            },
+            update: (updates) => {
+                return {
+                    eq: (field, value) => {
+                        if (table === 'profiles') {
+                            const profiles = JSON.parse(localStorage.getItem('local_profiles') || '[]');
+                            let found = false;
+                            profiles.forEach(p => {
+                                if (p[field] === value) {
+                                    Object.assign(p, updates);
+                                    found = true;
+                                }
+                            });
+                            if (!found && field === 'username') {
+                                profiles.push({ username: value, ...updates });
+                            }
+                            localStorage.setItem('local_profiles', JSON.stringify(profiles));
+                            localStorage.setItem('profiles_change', Date.now().toString());
+                            self.triggerListeners('profiles_change');
+                        }
+                        return Promise.resolve({ error: null });
+                    }
+                };
+            },
+            delete: () => {
+                return {
+                    eq: (field, value) => {
+                        if (table === 'room_signaling') {
+                            let signals = JSON.parse(localStorage.getItem('room_signaling') || '[]');
+                            signals = signals.filter(s => s[field] !== value);
+                            localStorage.setItem('room_signaling', JSON.stringify(signals));
+                            localStorage.setItem('room_signaling_change', Date.now().toString());
+                            self.triggerListeners('room_signaling_change');
+                        }
+                        return Promise.resolve({ error: null });
+                    }
+                };
+            }
+        };
+    }
+
+    channel(chanName) {
+        const self = this;
+        return {
+            on: function(event, filterObj, callback) {
+                self.listeners.push({
+                    channel: chanName,
+                    event,
+                    table: filterObj.table,
+                    filter: filterObj.filter,
+                    callback
+                });
+                return this;
+            },
+            subscribe: function() {
+                return this;
+            }
+        };
+    }
+}
+
+let db = null;
+try {
+    if (window.supabase) {
+        if (SUPABASE_URL && SUPABASE_URL !== "YOUR_SUPABASE_URL" && SUPABASE_URL.startsWith("http")) {
+            db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    }
+} catch(e) {
+    console.warn("Real Supabase init fell flat; using Mock Client for offline multi-tab calling validation.", e);
+}
+
+if (!db) {
+    console.log("Supabase not configured with valid public keys. Running in resilient Multi-Tab Storage Engine Mode.");
+    db = new LocalDBMock();
+}
 
 /* =========================================================
-   SUPABASE CONFIG
+   DOM OBJECTS
 ========================================================= */
+const authScreen = document.getElementById("authScreen");
+const appScreen = document.getElementById("appScreen");
+const authUsername = document.getElementById("authUsername");
+const authPassword = document.getElementById("authPassword");
+const loginBtn = document.getElementById("loginBtn");
+const signupBtn = document.getElementById("signupBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userProfile = document.getElementById("userProfile");
+const userListDiv = document.getElementById("userList");
 
-const SUPABASE_URL =
-"https://mmaqjiliufiqmqiljctx.supabase.co";
-
-const SUPABASE_ANON_KEY =
-"sb_publishable_enOltSr7SDPqyhd4dzkjYw_PI7rCjk9";
-
-const supabase =
-window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+const startMediaBtn = document.getElementById("startMediaBtn");
+const roomInput = document.getElementById("roomInput");
+const statusDiv = document.getElementById("status");
+const hangupBtn = document.getElementById("hangupBtn");
 
 /* =========================================================
-   DOM
+   STATE CONTROL GLOBALS
 ========================================================= */
-
-const localVideo =
-document.getElementById("localVideo");
-
-const remoteVideo =
-document.getElementById("remoteVideo");
-
-const joinBtn =
-document.getElementById("joinBtn");
-
-const startMediaBtn =
-document.getElementById("startMediaBtn");
-
-const roomInput =
-document.getElementById("roomInput");
-
-const usernameInput =
-document.getElementById("username");
-
-const statusDiv =
-document.getElementById("status");
-
-/* =========================================================
-   GLOBALS
-========================================================= */
-
 let localStream;
 let peerConnection;
 let roomId;
+let currentUsername = null;
 
-/* ICE SERVERS */
-
-const ICE_SERVERS = {
-    iceServers: [
-        {
-            urls: "stun:stun.l.google.com:19302"
-        }
-    ]
-};
+const ICE_SERVERS = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
 
 /* =========================================================
-   STATUS
+   PERSISTENT SESSION LOGIC (STAY LOGGED IN)
 ========================================================= */
-
-function setStatus(message, type=""){
-
-    statusDiv.innerText = message;
-    statusDiv.className =
-    "status " + type;
-}
-
-/* =========================================================
-   CAMERA + MIC
-========================================================= */
-
-async function startLocalMedia(){
-
-    try{
-
-        localStream =
-        await navigator.mediaDevices.getUserMedia({
-            video:true,
-            audio:true
-        });
-
-        localVideo.srcObject =
-        localStream;
-
-        setStatus(
-            "Camera & microphone enabled",
-            "success"
-        );
-
-    }catch(err){
-
-        console.error(err);
-
-        setStatus(
-            "Camera/mic permission denied",
-            "error"
-        );
-
-        alert(
-            "Camera or microphone access denied."
-        );
+async function checkSavedSession() {
+    const savedUser = localStorage.getItem("secure_username");
+    if (savedUser) {
+        currentUsername = savedUser;
+        await goOnline();
+    } else {
+        authScreen.style.display = "flex";
+        appScreen.style.display = "none";
     }
 }
 
-startMediaBtn.addEventListener(
-    "click",
-    startLocalMedia
-);
+async function goOnline() {
+    localStorage.setItem("secure_username", currentUsername);
+    authScreen.style.display = "none";
+    appScreen.style.display = "flex";
+    userProfile.innerText = `Logged in as: ${currentUsername}`;
+    
+    // Set user online state & clear busy state
+    await db.from("profiles").update({ 
+        is_online: true, 
+        is_busy: false,
+        last_seen: new Date() 
+    }).eq("username", currentUsername);
+    
+    loadOnlineUsers();
+    listenForUserChanges();
+    listenForIncomingCalls();
+}
 
-/* =========================================================
-   CREATE PEER CONNECTION
-========================================================= */
+// User Registration
+signupBtn.addEventListener("click", async () => {
+    const user = authUsername.value.trim();
+    const pass = authPassword.value.trim();
+    if(!user || !pass) return alert("Enter registration credentials");
 
-function createPeerConnection(){
-
-    peerConnection =
-    new RTCPeerConnection(
-        ICE_SERVERS
-    );
-
-    /* ADD LOCAL TRACKS */
-
-    localStream
-    .getTracks()
-    .forEach(track => {
-
-        peerConnection.addTrack(
-            track,
-            localStream
-        );
+    const { error } = await db.from("profiles").insert({ 
+        username: user, 
+        password: pass, 
+        is_online: true,
+        is_busy: false
     });
-
-    /* REMOTE STREAM */
-
-    peerConnection.ontrack =
-    event => {
-
-        remoteVideo.srcObject =
-        event.streams[0];
-
-        setStatus(
-            "Connected to remote peer",
-            "success"
-        );
-    };
-
-    /* ICE CANDIDATES */
-
-    peerConnection.onicecandidate =
-    async event => {
-
-        if(event.candidate){
-
-            await supabase
-            .from("room_signaling")
-            .insert({
-                room_id: roomId,
-                type: "candidate",
-                data: event.candidate,
-                sender: usernameInput.value.trim()
-            });
-        }
-    };
-
-    peerConnection.onconnectionstatechange =
-    () => {
-
-        console.log(
-            peerConnection.connectionState
-        );
-
-        if(
-            peerConnection.connectionState ===
-            "disconnected"
-        ){
-
-            setStatus(
-                "Peer disconnected",
-                "error"
-            );
-        }
-    };
-}
-
-/* =========================================================
-   JOIN ROOM
-========================================================= */
-
-joinBtn.addEventListener(
-"click",
-
-async () => {
-
-    roomId =
-    roomInput.value.trim();
-
-    const username =
-    usernameInput.value.trim();
-
-    if(!username){
-
-        alert("Enter username");
-        return;
+    if(error) {
+        alert("Username taken or database connection issue.");
+    } else {
+        currentUsername = user;
+        await goOnline();
     }
+});
 
-    if(!roomId){
-
-        alert("Enter room id");
-        return;
+// User Login
+loginBtn.addEventListener("click", async () => {
+    const user = authUsername.value.trim();
+    const pass = authPassword.value.trim();
+    
+    const { data, error } = await db.from("profiles").select("*").eq("username", user).eq("password", pass);
+    if(data && data.length > 0) {
+        currentUsername = user;
+        await goOnline();
+    } else {
+        alert("Invalid Username or Password configuration.");
     }
+});
 
-    if(!localStream){
-
-        alert(
-            "Enable camera/mic first"
-        );
-
-        return;
+// Log Out
+logoutBtn.addEventListener("click", async () => {
+    if(currentUsername) {
+        await db.from("profiles").update({ is_online: false, is_busy: false }).eq("username", currentUsername);
     }
-
-    setStatus("Joining room...");
-
-    createPeerConnection();
-
-    /* CHECK FOR EXISTING OFFER */
-
-    const { data: offers } =
-    await supabase
-    .from("room_signaling")
-    .select("*")
-    .eq("room_id", roomId)
-    .eq("type", "offer");
-
-    /* =====================================================
-       CALLER
-    ===================================================== */
-
-    if(
-        !offers ||
-        offers.length === 0
-    ){
-
-        /* DELETE OLD ENTRIES FOR CLEAN LIFECYCLE */
-        await supabase
-        .from("room_signaling")
-        .delete()
-        .eq("room_id", roomId);
-
-        setStatus(
-            "Waiting for peer..."
-        );
-
-        const offer =
-        await peerConnection.createOffer();
-
-        await peerConnection
-        .setLocalDescription(offer);
-
-        await supabase
-        .from("room_signaling")
-        .insert({
-            room_id: roomId,
-            type: "offer",
-            data: offer,
-            sender: username
-        });
-
-    }else{
-
-    /* =====================================================
-       CALLEE
-    ===================================================== */
-
-        const offer =
-        offers[0].data;
-
-        await peerConnection
-        .setRemoteDescription(
-            new RTCSessionDescription(
-                offer
-            )
-        );
-
-        const answer =
-        await peerConnection.createAnswer();
-
-        await peerConnection
-        .setLocalDescription(answer);
-
-        await supabase
-        .from("room_signaling")
-        .insert({
-            room_id: roomId,
-            type: "answer",
-            data: answer,
-            sender: username
-        });
-
-        setStatus(
-            "Answer sent..."
-        );
-    }
-
-    /* =====================================================
-       REALTIME SIGNALING
-    ===================================================== */
-
-    supabase
-
-    .channel(
-        "room-" + roomId
-    )
-
-    .on(
-        "postgres_changes",
-
-        {
-            event:"INSERT",
-            schema:"public",
-            table:"room_signaling",
-            filter:`room_id=eq.${roomId}`
-        },
-
-        async payload => {
-
-            const signal =
-            payload.new;
-
-            /* IGNORE SELF-SENT SIGNALS (FIX FOR THE ICE LOOP BUG) */
-            if (
-                signal.sender ===
-                usernameInput.value.trim()
-            ) {
-                return;
-            }
-
-            /* ANSWER */
-
-            if(
-                signal.type === "answer" &&
-                !peerConnection
-                .currentRemoteDescription
-            ){
-
-                await peerConnection
-                .setRemoteDescription(
-                    new RTCSessionDescription(
-                        signal.data
-                    )
-                );
-
-                setStatus(
-                    "Peer connected",
-                    "success"
-                );
-            }
-
-            /* ICE */
-
-            if(
-                signal.type ===
-                "candidate"
-            ){
-
-                try{
-
-                    await peerConnection
-                    .addIceCandidate(
-                        new RTCIceCandidate(
-                            signal.data
-                        )
-                    );
-
-                }catch(err){
-
-                    console.error(
-                        "ICE ERROR:",
-                        err
-                    );
-                }
-            }
-        }
-    )
-
-    .subscribe();
+    localStorage.removeItem("secure_username");
+    currentUsername = null;
+    window.location.reload();
 });
 
 /* =========================================================
-   AUTO ENABLE MEDIA
+   REALTIME ONLINE USER LIST TRACKER (WITH ACTIVE DOTS & BUSY STATES)
 ========================================================= */
-
-usernameInput.addEventListener(
-    "change",
-
-    async () => {
-
-        if(
-            usernameInput
-            .value
-            .trim() &&
-            !localStream
-        ){
-
-            await startLocalMedia();
-        }
+async function loadOnlineUsers() {
+    const { data } = await db.from("profiles").select("*").eq("is_online", true);
+    userListDiv.innerHTML = "";
+    
+    if(data) {
+        data.forEach(u => {
+            if(u.username === currentUsername) return; // Skip listing yourself
+            
+            const div = document.createElement("div");
+            div.className = "user-item";
+            
+            const isBusy = u.is_busy === true;
+            const dotClass = isBusy ? "status-dot busy" : "status-dot online";
+            
+            const btnHtml = isBusy 
+                ? `<button class="call-btn busy-btn" disabled>BUSY</button>`
+                : `<button class="call-btn" onclick="initiateCall('${u.username}')">CALL</button>`;
+                
+            div.innerHTML = `
+                <div style="display: flex; align-items: center; overflow: hidden; gap: 4px;">
+                    <span class="${dotClass}"></span>
+                    <span style="font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500;">${u.username}</span>
+                </div>
+                ${btnHtml}
+            `;
+            userListDiv.appendChild(div);
+        });
     }
-);
+}
 
+function listenForUserChanges() {
+    db.channel("global-presence")
+    .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
+        loadOnlineUsers();
+    }).subscribe();
+}
+
+/* =========================================================
+   DYNAMIC P2P CLICK-TO-CALL INFRASTRUCTURE
+========================================================= */
+function setStatus(message, type=""){
+    statusDiv.innerText = message;
+    statusDiv.className = "status " + type;
+}
+
+async function startLocalMedia(){
+    if(localStream) return;
+    try{
+        localStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+        localVideo.srcObject = localStream;
+        setStatus("Camera initialized", "success");
+    }catch(err){
+        setStatus("Camera access required", "error");
+    }
+}
+
+startMediaBtn.addEventListener("click", startLocalMedia);
+
+function createPeerConnection(){
+    peerConnection = new RTCPeerConnection(ICE_SERVERS);
+    localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+    peerConnection.ontrack = event => { 
+        remoteVideo.srcObject = event.streams[0]; 
+        setStatus("Connected", "success"); 
+        hangupBtn.style.display = "flex";
+    };
+    
+    peerConnection.onicecandidate = async event => {
+        if(event.candidate){
+            await db.from("room_signaling").insert({ 
+                room_id: roomId, 
+                type: "candidate", 
+                data: event.candidate, 
+                sender: currentUsername 
+            });
+        }
+    };
+}
+
+// Executed when you click "CALL" on someone
+async function initiateCall(targetUser) {
+    if(!localStream) await startLocalMedia();
+    
+    // Generate a unique room connection path named after both users
+    roomId = `call-${currentUsername}-${targetUser}`;
+    setStatus(`Calling ${targetUser}...`);
+    hangupBtn.style.display = "flex";
+    
+    // Set local state to busy via backend database
+    await db.from("profiles").update({ is_busy: true }).eq("username", currentUsername);
+    
+    createPeerConnection();
+    
+    // Clear any leftover signaling rows from previous tests in this room lifecycle
+    await db.from("room_signaling").delete().eq("room_id", roomId);
+    
+    const offer = await peerConnection.createOffer();
+    await peerConnection.setLocalDescription(offer);
+    
+    await db.from("room_signaling").insert({ 
+        room_id: roomId, 
+        type: "offer", 
+        data: offer, 
+        sender: currentUsername 
+    });
+    
+    connectSignalingChannel(roomId);
+}
+
+// Executed constantly in the background listening if anyone calls YOU
+function listenForIncomingCalls() {
+    db.channel("incoming-calls")
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "room_signaling", filter: `type=eq.offer` }, async payload => {
+        const signal = payload.new;
+        
+        // Check if the auto-generated room name includes your username as the receiver
+        if(signal.room_id.endsWith(`-${currentUsername}`)) {
+            const accept = confirm(`Incoming call from ${signal.sender}. Accept?`);
+            if(!accept) {
+                // DECLINED SIGNALING SENDBACK
+                await db.from("room_signaling").insert({
+                    room_id: signal.room_id,
+                    type: "reject",
+                    sender: currentUsername
+                });
+                return;
+            }
+            
+            if(!localStream) await startLocalMedia();
+            roomId = signal.room_id;
+            
+            setStatus("Connecting handshake...");
+            hangupBtn.style.display = "flex";
+            
+            // Set local state to busy via backend database
+            await db.from("profiles").update({ is_busy: true }).eq("username", currentUsername);
+            
+            createPeerConnection();
+            
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(signal.data));
+            const answer = await peerConnection.createAnswer();
+            await peerConnection.setLocalDescription(answer);
+            
+            await db.from("room_signaling").insert({ 
+                room_id: roomId, 
+                type: "answer", 
+                data: answer, 
+                sender: currentUsername 
+            });
+            
+            connectSignalingChannel(roomId);
+        }
+    }).subscribe();
+}
+
+function connectSignalingChannel(activeRoomId) {
+    db.channel("room-" + activeRoomId)
+    .on("postgres_changes", { event:"INSERT", schema:"public", table:"room_signaling", filter:`room_id=eq.${activeRoomId}` }, async payload => {
+        const signal = payload.new;
+        if (signal.sender === currentUsername) return;
+
+        // Remote user accepted and sent back SDP Answer
+        if(signal.type === "answer" && !peerConnection.currentRemoteDescription){
+            await peerConnection.setRemoteDescription(new RTCSessionDescription(signal.data));
+            setStatus("Call Connected!", "success");
+            hangupBtn.style.display = "flex";
+        }
+        
+        // Remote user sent ICE Candidate
+        if(signal.type === "candidate"){
+            try{ 
+                await peerConnection.addIceCandidate(new RTCIceCandidate(signal.data)); 
+            } catch(e){}
+        }
+
+        // Remote user rejected the call request
+        if(signal.type === "reject"){
+            setStatus("Call Declined", "error");
+            setTimeout(() => {
+                endCall(false);
+            }, 3000);
+        }
+
+        // Remote user hung up standardly
+        if(signal.type === "hangup"){
+            setStatus("Call Ended by Peer", "error");
+            endCall(false);
+        }
+    }).subscribe();
+}
+
+/* =========================================================
+   CALL END / HANG UP HANDLERS
+========================================================= */
+async function endCall(notifyPeer = true) {
+    setStatus("Hanging up...");
+
+    // Send hang up packet to signaling DB if notifyPeer is set to True
+    if(notifyPeer && roomId) {
+        await db.from("room_signaling").insert({
+            room_id: roomId,
+            type: "hangup",
+            sender: currentUsername
+        });
+    }
+
+    // Terminate Peer Connection
+    if(peerConnection) {
+        try {
+            peerConnection.close();
+        } catch(e) {}
+        peerConnection = null;
+    }
+
+    // Clean Video Elements
+    remoteVideo.srcObject = null;
+
+    // Remove DB rows for the specific room id
+    if(roomId) {
+        await db.from("room_signaling").delete().eq("room_id", roomId);
+    }
+
+    // Make local user profile status available again (is_busy: false)
+    if(currentUsername) {
+        await db.from("profiles").update({ is_busy: false }).eq("username", currentUsername);
+    }
+
+    // Transition state back to idle
+    setTimeout(() => {
+        setStatus("Idle");
+    }, 1000);
+    
+    hangupBtn.style.display = "none";
+    roomId = null;
+}
+
+hangupBtn.addEventListener("click", () => {
+    endCall(true);
+});
+
+/* =========================================================
+   CLEAN EXIT ON DISCONNECT
+========================================================= */
+window.addEventListener("beforeunload", async () => {
+    if(currentUsername) {
+        await db.from("profiles").update({ 
+            is_online: false, 
+            is_busy: false 
+        }).eq("username", currentUsername);
+    }
+});
+
+// Start checking the session status immediately
+checkSavedSession();
 </script>
-
 </body>
 </html>
