@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-<title>Dashboard</title>
+<title>Google Classroom</title>
 
 <link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png">
 
@@ -22,14 +22,12 @@ body{
     overflow:hidden;
 }
 
-/* MAIN LAYOUT */
 .app{
     display:flex;
     width:100vw;
     height:100vh;
 }
 
-/* SIDEBAR */
 .sidebar{
     width:260px;
     background:#141414;
@@ -80,7 +78,6 @@ button:hover{
     opacity:0.9;
 }
 
-/* VIDEO AREA */
 .main{
     flex:1;
     position:relative;
@@ -107,7 +104,6 @@ button:hover{
     z-index:100;
 }
 
-/* STATUS */
 .status{
     position:absolute;
     top:20px;
@@ -132,7 +128,6 @@ button:hover{
 
 <div class="app">
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
 
         <div class="logo">Secure Call</div>
@@ -157,18 +152,24 @@ button:hover{
 
     </div>
 
-    <!-- MAIN VIDEO AREA -->
     <div class="main">
 
         <div id="status" class="status">
             Idle
         </div>
 
-        <!-- REMOTE VIDEO -->
-        <video id="remoteVideo" autoplay playsinline></video>
+        <video
+            id="remoteVideo"
+            autoplay
+            playsinline
+        ></video>
 
-        <!-- LOCAL VIDEO -->
-        <video id="localVideo" autoplay muted playsinline></video>
+        <video
+            id="localVideo"
+            autoplay
+            muted
+            playsinline
+        ></video>
 
     </div>
 
@@ -177,13 +178,7 @@ button:hover{
 <!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<script> const ICE_SERVERS = {
-    iceServers: [
-        {
-            urls: "stun:stun.l.google.com:19302"
-        }
-    ]
-};
+<script>
 
 /* =========================================================
    TAB CLOAKING
@@ -191,8 +186,12 @@ button:hover{
 
 document.title = "Google Classroom";
 
-const favicon = document.querySelector("link[rel='icon']");
-favicon.href = "https://ssl.gstatic.com/classroom/favicon.png";
+const favicon = document.querySelector(
+    "link[rel='icon']"
+);
+
+favicon.href =
+"https://ssl.gstatic.com/classroom/favicon.png";
 
 /* =========================================================
    CLOUDFLARE WORKER PROXY HOOK
@@ -202,18 +201,24 @@ const WORKER_PROXY_PREFIX = "/service/";
 
 /*
 Example usage:
+
 window.location.href =
-WORKER_PROXY_PREFIX + encodeURIComponent(url)
+WORKER_PROXY_PREFIX +
+encodeURIComponent("https://example.com");
 */
 
 /* =========================================================
    SUPABASE CONFIG
 ========================================================= */
 
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL =
+"https://mmaqjiliufiqmqiljctx.supabase.co";
 
-const supabase = window.supabase.createClient(
+const SUPABASE_ANON_KEY =
+"sb_publishable_enOltSr7SDPqyhd4dzkjYw_PI7rCjk9";
+
+const supabase =
+window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY
 );
@@ -222,16 +227,26 @@ const supabase = window.supabase.createClient(
    DOM
 ========================================================= */
 
-const localVideo = document.getElementById("localVideo");
-const remoteVideo = document.getElementById("remoteVideo");
+const localVideo =
+document.getElementById("localVideo");
 
-const joinBtn = document.getElementById("joinBtn");
-const startMediaBtn = document.getElementById("startMediaBtn");
+const remoteVideo =
+document.getElementById("remoteVideo");
 
-const roomInput = document.getElementById("roomInput");
-const usernameInput = document.getElementById("username");
+const joinBtn =
+document.getElementById("joinBtn");
 
-const statusDiv = document.getElementById("status");
+const startMediaBtn =
+document.getElementById("startMediaBtn");
+
+const roomInput =
+document.getElementById("roomInput");
+
+const usernameInput =
+document.getElementById("username");
+
+const statusDiv =
+document.getElementById("status");
 
 /* =========================================================
    GLOBALS
@@ -241,6 +256,8 @@ let localStream;
 let peerConnection;
 let roomId;
 
+/* ICE SERVERS */
+
 const ICE_SERVERS = {
     iceServers: [
         {
@@ -249,19 +266,19 @@ const ICE_SERVERS = {
     ]
 };
 
-const pendingCandidates = [];
-
 /* =========================================================
-   STATUS UI
+   STATUS
 ========================================================= */
 
 function setStatus(message, type=""){
+
     statusDiv.innerText = message;
-    statusDiv.className = "status " + type;
+    statusDiv.className =
+    "status " + type;
 }
 
 /* =========================================================
-   MEDIA ACCESS
+   CAMERA + MIC
 ========================================================= */
 
 async function startLocalMedia(){
@@ -269,14 +286,18 @@ async function startLocalMedia(){
     try{
 
         localStream =
-            await navigator.mediaDevices.getUserMedia({
-                video:true,
-                audio:true
-            });
+        await navigator.mediaDevices.getUserMedia({
+            video:true,
+            audio:true
+        });
 
-        localVideo.srcObject = localStream;
+        localVideo.srcObject =
+        localStream;
 
-        setStatus("Camera & microphone enabled", "success");
+        setStatus(
+            "Camera & microphone enabled",
+            "success"
+        );
 
     }catch(err){
 
@@ -288,7 +309,7 @@ async function startLocalMedia(){
         );
 
         alert(
-            "Camera or microphone access was denied."
+            "Camera or microphone access denied."
         );
     }
 }
@@ -305,17 +326,29 @@ startMediaBtn.addEventListener(
 function createPeerConnection(){
 
     peerConnection =
-        new RTCPeerConnection(ICE_SERVERS);
+    new RTCPeerConnection(
+        ICE_SERVERS
+    );
 
     /* ADD LOCAL TRACKS */
-    localStream.getTracks().forEach(track => {
-        peerConnection.addTrack(track, localStream);
+
+    localStream
+    .getTracks()
+    .forEach(track => {
+
+        peerConnection.addTrack(
+            track,
+            localStream
+        );
     });
 
     /* REMOTE STREAM */
-    peerConnection.ontrack = event => {
 
-        remoteVideo.srcObject = event.streams[0];
+    peerConnection.ontrack =
+    event => {
+
+        remoteVideo.srcObject =
+        event.streams[0];
 
         setStatus(
             "Connected to remote peer",
@@ -324,25 +357,27 @@ function createPeerConnection(){
     };
 
     /* ICE CANDIDATES */
+
     peerConnection.onicecandidate =
-        async event => {
+    async event => {
 
         if(event.candidate){
 
             await supabase
-                .from("room_signaling")
-                .insert({
-                    room_id: roomId,
-                    type: "candidate",
-                    data: event.candidate
-                });
+            .from("room_signaling")
+            .insert({
+                room_id: roomId,
+                type: "candidate",
+                data: event.candidate,
+                sender: usernameInput.value.trim()
+            });
         }
     };
 
-    peerConnection.onconnectionstatechange = () => {
+    peerConnection.onconnectionstatechange =
+    () => {
 
         console.log(
-            "Connection state:",
             peerConnection.connectionState
         );
 
@@ -350,7 +385,11 @@ function createPeerConnection(){
             peerConnection.connectionState ===
             "disconnected"
         ){
-            setStatus("Peer disconnected", "error");
+
+            setStatus(
+                "Peer disconnected",
+                "error"
+            );
         }
     };
 }
@@ -360,26 +399,34 @@ function createPeerConnection(){
 ========================================================= */
 
 joinBtn.addEventListener(
-    "click",
-    async () => {
+"click",
 
-    roomId = roomInput.value.trim();
+async () => {
+
+    roomId =
+    roomInput.value.trim();
 
     const username =
-        usernameInput.value.trim();
+    usernameInput.value.trim();
 
     if(!username){
-        alert("Enter a username");
+
+        alert("Enter username");
         return;
     }
 
     if(!roomId){
+
         alert("Enter room id");
         return;
     }
 
     if(!localStream){
-        alert("Enable camera/mic first");
+
+        alert(
+            "Enable camera/mic first"
+        );
+
         return;
     }
 
@@ -387,35 +434,48 @@ joinBtn.addEventListener(
 
     createPeerConnection();
 
-    /* CHECK EXISTING OFFER */
+    /* CHECK FOR EXISTING OFFER */
+
     const { data: offers } =
-        await supabase
-        .from("room_signaling")
-        .select("*")
-        .eq("room_id", roomId)
-        .eq("type", "offer");
+    await supabase
+    .from("room_signaling")
+    .select("*")
+    .eq("room_id", roomId)
+    .eq("type", "offer");
 
     /* =====================================================
        CALLER
     ===================================================== */
 
-    if(!offers || offers.length === 0){
+    if(
+        !offers ||
+        offers.length === 0
+    ){
 
-        setStatus("Waiting for peer...");
+        /* DELETE OLD ENTRIES FOR CLEAN LIFECYCLE */
+        await supabase
+        .from("room_signaling")
+        .delete()
+        .eq("room_id", roomId);
+
+        setStatus(
+            "Waiting for peer..."
+        );
 
         const offer =
-            await peerConnection.createOffer();
+        await peerConnection.createOffer();
 
         await peerConnection
-            .setLocalDescription(offer);
+        .setLocalDescription(offer);
 
         await supabase
-            .from("room_signaling")
-            .insert({
-                room_id: roomId,
-                type: "offer",
-                data: offer
-            });
+        .from("room_signaling")
+        .insert({
+            room_id: roomId,
+            type: "offer",
+            data: offer,
+            sender: username
+        });
 
     }else{
 
@@ -423,29 +483,33 @@ joinBtn.addEventListener(
        CALLEE
     ===================================================== */
 
-        const offer = offers[0].data;
+        const offer =
+        offers[0].data;
 
         await peerConnection
-            .setRemoteDescription(
-                new RTCSessionDescription(offer)
-            );
+        .setRemoteDescription(
+            new RTCSessionDescription(
+                offer
+            )
+        );
 
         const answer =
-            await peerConnection.createAnswer();
+        await peerConnection.createAnswer();
 
         await peerConnection
-            .setLocalDescription(answer);
+        .setLocalDescription(answer);
 
         await supabase
-            .from("room_signaling")
-            .insert({
-                room_id: roomId,
-                type: "answer",
-                data: answer
-            });
+        .from("room_signaling")
+        .insert({
+            room_id: roomId,
+            type: "answer",
+            data: answer,
+            sender: username
+        });
 
         setStatus(
-            "Answer sent. Connecting..."
+            "Answer sent..."
         );
     }
 
@@ -454,10 +518,14 @@ joinBtn.addEventListener(
     ===================================================== */
 
     supabase
-    .channel("room-" + roomId)
+
+    .channel(
+        "room-" + roomId
+    )
 
     .on(
         "postgres_changes",
+
         {
             event:"INSERT",
             schema:"public",
@@ -467,20 +535,31 @@ joinBtn.addEventListener(
 
         async payload => {
 
-            const signal = payload.new;
+            const signal =
+            payload.new;
+
+            /* IGNORE SELF-SENT SIGNALS (FIX FOR THE ICE LOOP BUG) */
+            if (
+                signal.sender ===
+                usernameInput.value.trim()
+            ) {
+                return;
+            }
 
             /* ANSWER */
+
             if(
                 signal.type === "answer" &&
-                !peerConnection.currentRemoteDescription
+                !peerConnection
+                .currentRemoteDescription
             ){
 
                 await peerConnection
-                    .setRemoteDescription(
-                        new RTCSessionDescription(
-                            signal.data
-                        )
-                    );
+                .setRemoteDescription(
+                    new RTCSessionDescription(
+                        signal.data
+                    )
+                );
 
                 setStatus(
                     "Peer connected",
@@ -488,22 +567,26 @@ joinBtn.addEventListener(
                 );
             }
 
-            /* CANDIDATES */
-            if(signal.type === "candidate"){
+            /* ICE */
+
+            if(
+                signal.type ===
+                "candidate"
+            ){
 
                 try{
 
                     await peerConnection
-                        .addIceCandidate(
-                            new RTCIceCandidate(
-                                signal.data
-                            )
-                        );
+                    .addIceCandidate(
+                        new RTCIceCandidate(
+                            signal.data
+                        )
+                    );
 
                 }catch(err){
 
                     console.error(
-                        "ICE error:",
+                        "ICE ERROR:",
                         err
                     );
                 }
@@ -515,20 +598,25 @@ joinBtn.addEventListener(
 });
 
 /* =========================================================
-   AUTO MEDIA START AFTER USERNAME
+   AUTO ENABLE MEDIA
 ========================================================= */
 
 usernameInput.addEventListener(
     "change",
+
     async () => {
 
-    if(
-        usernameInput.value.trim() &&
-        !localStream
-    ){
-        await startLocalMedia();
+        if(
+            usernameInput
+            .value
+            .trim() &&
+            !localStream
+        ){
+
+            await startLocalMedia();
+        }
     }
-});
+);
 
 </script>
 
