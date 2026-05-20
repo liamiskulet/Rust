@@ -1,6 +1,6 @@
 {
   "name": "secure-call-dashboard",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "WebRTC video/audio calling dashboard with custom account profile storage, active presence indicators, and direct click-to-call matching.",
   "main": "index.html",
   "scripts": {
