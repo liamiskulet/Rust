@@ -1,4 +1,4 @@
-name: Deploy Website to GitHub Pages
+name: Publish to NPM and Unpkg
 
 on:
   push:
@@ -7,34 +7,31 @@ on:
 
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
-
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  publish:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Pages Configuration
-        uses: actions/configure-pages@v4
-
-      - name: Upload Static Web Files
-        uses: actions/upload-pages-artifact@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          # This uploads your index.html directly from your main folder
-          path: '.'
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
 
-      - name: Deploy Live Site
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Publish To NPM
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
