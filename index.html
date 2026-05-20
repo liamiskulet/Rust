@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Dashboard</title>
+
+<link rel="icon" href="https://ssl.gstatic.com/classroom/favicon.png">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:#0f0f0f;
+    color:white;
+    overflow:hidden;
+}
+
+/* MAIN LAYOUT */
+.app{
+    display:flex;
+    width:100vw;
+    height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:260px;
+    background:#141414;
+    border-right:1px solid #242424;
+    padding:20px;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:25px;
+}
+
+.input-group{
+    margin-bottom:16px;
+}
+
+.input-group label{
+    display:block;
+    margin-bottom:6px;
+    color:#aaa;
+    font-size:14px;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    border:none;
+    outline:none;
+    border-radius:10px;
+    background:#1e1e1e;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#3b82f6;
+    color:white;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+/* VIDEO AREA */
+.main{
+    flex:1;
+    position:relative;
+    background:#0a0a0a;
+}
+
+#remoteVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:black;
+}
+
+#localVideo{
+    position:absolute;
+    width:240px;
+    height:160px;
+    right:20px;
+    bottom:20px;
+    border-radius:14px;
+    object-fit:cover;
+    border:2px solid #333;
+    background:black;
+    z-index:100;
+}
+
+/* STATUS */
+.status{
+    position:absolute;
+    top:20px;
+    left:20px;
+    padding:10px 14px;
+    border-radius:10px;
+    background:rgba(0,0,0,0.6);
+    font-size:14px;
+    z-index:50;
+}
+
+.error{
+    color:#ff5b5b;
+}
+
+.success{
+    color:#58ff8a;
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <div class="logo">Secure Call</div>
+
+        <div class="input-group">
+            <label>User Handle</label>
+            <input id="username" placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+            <label>Room ID</label>
+            <input id="roomInput" placeholder="Enter room id">
+        </div>
+
+        <button id="startMediaBtn">
+            ENABLE CAMERA/MIC
+        </button>
+
+        <button id="joinBtn">
+            JOIN ROOM
+        </button>
+
+    </div>
+
+    <!-- MAIN VIDEO AREA -->
+    <div class="main">
+
+        <div id="status" class="status">
+            Idle
+        </div>
+
+        <!-- REMOTE VIDEO -->
+        <video id="remoteVideo" autoplay playsinline></video>
+
+        <!-- LOCAL VIDEO -->
+        <video id="localVideo" autoplay muted playsinline></video>
+
+    </div>
+
+</div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================================================
+   TAB CLOAKING
+========================================================= */
+
+document.title = "Google Classroom";
+
+const favicon = document.querySelector("link[rel='icon']");
+favicon.href = "https://ssl.gstatic.com/classroom/favicon.png";
+
+/* =========================================================
+   CLOUDFLARE WORKER PROXY HOOK
+========================================================= */
+
+const WORKER_PROXY_PREFIX = "/service/";
+
+/*
+Example usage:
+window.location.href =
+WORKER_PROXY_PREFIX + encodeURIComponent(url)
+*/
+
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
+
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const localVideo = document.getElementById("localVideo");
+const remoteVideo = document.getElementById("remoteVideo");
+
+const joinBtn = document.getElementById("joinBtn");
+const startMediaBtn = document.getElementById("startMediaBtn");
+
+const roomInput = document.getElementById("roomInput");
+const usernameInput = document.getElementById("username");
+
+const statusDiv = document.getElementById("status");
+
+/* =========================================================
+   GLOBALS
+========================================================= */
+
+let localStream;
+let peerConnection;
+let roomId;
+
+const ICE_SERVERS = {
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302"
+        }
+    ]
+};
+
+const pendingCandidates = [];
+
+/* =========================================================
+   STATUS UI
+========================================================= */
+
+function setStatus(message, type=""){
+    statusDiv.innerText = message;
+    statusDiv.className = "status " + type;
+}
+
+/* =========================================================
+   MEDIA ACCESS
+========================================================= */
+
+async function startLocalMedia(){
+
+    try{
+
+        localStream =
+            await navigator.mediaDevices.getUserMedia({
+                video:true,
+                audio:true
+            });
+
+        localVideo.srcObject = localStream;
+
+        setStatus("Camera & microphone enabled", "success");
+
+    }catch(err){
+
+        console.error(err);
+
+        setStatus(
+            "Camera/mic permission denied",
+            "error"
+        );
+
+        alert(
+            "Camera or microphone access was denied."
+        );
+    }
+}
+
+startMediaBtn.addEventListener(
+    "click",
+    startLocalMedia
+);
+
+/* =========================================================
+   CREATE PEER CONNECTION
+========================================================= */
+
+function createPeerConnection(){
+
+    peerConnection =
+        new RTCPeerConnection(ICE_SERVERS);
+
+    /* ADD LOCAL TRACKS */
+    localStream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, localStream);
+    });
+
+    /* REMOTE STREAM */
+    peerConnection.ontrack = event => {
+
+        remoteVideo.srcObject = event.streams[0];
+
+        setStatus(
+            "Connected to remote peer",
+            "success"
+        );
+    };
+
+    /* ICE CANDIDATES */
+    peerConnection.onicecandidate =
+        async event => {
+
+        if(event.candidate){
+
+            await supabase
+                .from("room_signaling")
+                .insert({
+                    room_id: roomId,
+                    type: "candidate",
+                    data: event.candidate
+                });
+        }
+    };
+
+    peerConnection.onconnectionstatechange = () => {
+
+        console.log(
+            "Connection state:",
+            peerConnection.connectionState
+        );
+
+        if(
+            peerConnection.connectionState ===
+            "disconnected"
+        ){
+            setStatus("Peer disconnected", "error");
+        }
+    };
+}
+
+/* =========================================================
+   JOIN ROOM
+========================================================= */
+
+joinBtn.addEventListener(
+    "click",
+    async () => {
+
+    roomId = roomInput.value.trim();
+
+    const username =
+        usernameInput.value.trim();
+
+    if(!username){
+        alert("Enter a username");
+        return;
+    }
+
+    if(!roomId){
+        alert("Enter room id");
+        return;
+    }
+
+    if(!localStream){
+        alert("Enable camera/mic first");
+        return;
+    }
+
+    setStatus("Joining room...");
+
+    createPeerConnection();
+
+    /* CHECK EXISTING OFFER */
+    const { data: offers } =
+        await supabase
+        .from("room_signaling")
+        .select("*")
+        .eq("room_id", roomId)
+        .eq("type", "offer");
+
+    /* =====================================================
+       CALLER
+    ===================================================== */
+
+    if(!offers || offers.length === 0){
+
+        setStatus("Waiting for peer...");
+
+        const offer =
+            await peerConnection.createOffer();
+
+        await peerConnection
+            .setLocalDescription(offer);
+
+        await supabase
+            .from("room_signaling")
+            .insert({
+                room_id: roomId,
+                type: "offer",
+                data: offer
+            });
+
+    }else{
+
+    /* =====================================================
+       CALLEE
+    ===================================================== */
+
+        const offer = offers[0].data;
+
+        await peerConnection
+            .setRemoteDescription(
+                new RTCSessionDescription(offer)
+            );
+
+        const answer =
+            await peerConnection.createAnswer();
+
+        await peerConnection
+            .setLocalDescription(answer);
+
+        await supabase
+            .from("room_signaling")
+            .insert({
+                room_id: roomId,
+                type: "answer",
+                data: answer
+            });
+
+        setStatus(
+            "Answer sent. Connecting..."
+        );
+    }
+
+    /* =====================================================
+       REALTIME SIGNALING
+    ===================================================== */
+
+    supabase
+    .channel("room-" + roomId)
+
+    .on(
+        "postgres_changes",
+        {
+            event:"INSERT",
+            schema:"public",
+            table:"room_signaling",
+            filter:`room_id=eq.${roomId}`
+        },
+
+        async payload => {
+
+            const signal = payload.new;
+
+            /* ANSWER */
+            if(
+                signal.type === "answer" &&
+                !peerConnection.currentRemoteDescription
+            ){
+
+                await peerConnection
+                    .setRemoteDescription(
+                        new RTCSessionDescription(
+                            signal.data
+                        )
+                    );
+
+                setStatus(
+                    "Peer connected",
+                    "success"
+                );
+            }
+
+            /* CANDIDATES */
+            if(signal.type === "candidate"){
+
+                try{
+
+                    await peerConnection
+                        .addIceCandidate(
+                            new RTCIceCandidate(
+                                signal.data
+                            )
+                        );
+
+                }catch(err){
+
+                    console.error(
+                        "ICE error:",
+                        err
+                    );
+                }
+            }
+        }
+    )
+
+    .subscribe();
+});
+
+/* =========================================================
+   AUTO MEDIA START AFTER USERNAME
+========================================================= */
+
+usernameInput.addEventListener(
+    "change",
+    async () => {
+
+    if(
+        usernameInput.value.trim() &&
+        !localStream
+    ){
+        await startLocalMedia();
+    }
+});
+
+</script>
+
+</body>
+</html>
