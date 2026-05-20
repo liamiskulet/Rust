@@ -1,0 +1,26 @@
+{
+  "name": "secure-call-dashboard",
+  "version": "1.0.0",
+  "description": "WebRTC video/audio calling dashboard with Supabase signaling and Cloudflare Worker proxy support",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve .",
+    "build": "echo \"Static project - no build step required\""
+  },
+  "keywords": [
+    "webrtc",
+    "supabase",
+    "video-call",
+    "audio-call",
+    "cloudflare-workers",
+    "proxy",
+    "realtime"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}
